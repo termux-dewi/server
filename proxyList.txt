@@ -8,7 +8,7 @@
 172.232.239.151,587,ID,Akamai Technologies  Inc
 172.232.239.249,587,ID,Akamai Technologies  Inc
 103.133.223.50,2096,ID,Pt Cloud Teknologi Nusantara
-103.133.223.51,2096,ID,Pt Cloud Teknologi Nusantara
+103.133.223.51,2096,ID,Pt Clouds Teknologi Nusantara
 103.186.1.209,2053,ID,Pt Cloud Hosting Indonesia
 103.6.207.108,8080,ID,Pt Pusat Media Indonesia
 103.168.46.169,20132,ID,Tes Inactive Server
