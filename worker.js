@@ -23,7 +23,7 @@ async function getProxyList(env) {
    * Contoh:
    * 1.1.1.1,443,SG,Cloudflare Inc.
    */
-  const proxyBankUrl = env.PROXY_BANK_URL || "";
+  const proxyBankUrl = env.PROXY_BANK_URL || "https://github.com/Jancokbgt/Nautica/blob/main/proxyList.txt";
   if (!proxyBankUrl) {
     throw new Error("No Proxy Bank URL Provided!");
   }
