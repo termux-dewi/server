@@ -2,7 +2,7 @@ import { connect } from "cloudflare:sockets";
 
 // Variables
 const rootDomain = "simokasu.web.id"; // Ganti dengan domain utama kalian
-const serviceName = "desu"; // Ganti dengan nama workers kalian
+const serviceName = "simok"; // Ganti dengan nama workers kalian
 const apiKey = ""; // Ganti dengan Global API key kalian (https://dash.cloudflare.com/profile/api-tokens)
 const apiEmail = ""; // Ganti dengan email yang kalian gunakan
 const accountID = ""; // Ganti dengan Account ID kalian (https://dash.cloudflare.com -> Klik domain yang kalian gunakan)
