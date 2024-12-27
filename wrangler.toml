@@ -1,6 +1,10 @@
-name = "simok"
+name = "free"
 main = "_worker.js"
 compatibility_date = "2023-08-23"
+
+[[routes]]
+pattern = "simokasu.web.id"
+custom_domain = true
 
 [unsafe.metadata.observability]
 enabled = true
