@@ -1,7 +1,7 @@
 import { connect } from "cloudflare:sockets";
 
 // Variables
-const rootDomain = "foolvpn.me"; // Ganti dengan domain utama kalian
+const rootDomain = "okepeb.web.id"; // Ganti dengan domain utama kalian
 const serviceName = "nautica"; // Ganti dengan nama workers kalian
 const apiKey = "04961c95dd839885a32fff0bac57810af455b"; // Ganti dengan Global API key kalian (https://dash.cloudflare.com/profile/api-tokens)
 const apiEmail = "contact@okepeb.web.id"; // Ganti dengan email yang kalian gunakan
