@@ -8,6 +8,9 @@ custom_domain = true
 pattern = "quiz.int.vidio.com.vpn.bungur.my.id"
 custom_domain = true
 
+[vars]
+UUID = "ba5e7ae5-b3f6-4f8f-8f24-05ba9e3fe81c"
+
 [unsafe.metadata.observability]
 enabled = true
 
