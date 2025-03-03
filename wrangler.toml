@@ -1,6 +1,12 @@
-name = "nautica"
+name = "vpn"
 main = "_worker.js"
 compatibility_date = "2023-08-23"
+[[route]]
+pattern = "vpn.bungur.my.id"
+custom_domain = true
+[[route]]
+pattern = "quiz.int.vidio.com.vpn.bungur.my.id"
+custom_domain = true
 
 [unsafe.metadata.observability]
 enabled = true
