@@ -13,3 +13,9 @@ vars = {
   ACCOUNT_ID = "bfa559c07654f675a3e7744376f36b47",
   ZONE_ID = "f7cab408c61a317dbad39a31b64f8dce"
 }
+
+[unsafe.metadata.observability]
+enabled = true
+
+[observability.logs]
+enabled = true
