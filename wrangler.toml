@@ -8,8 +8,8 @@ SERVICE_NAME = "vpn"
 
 [env.production]
 vars = { 
-  API_KEY = "@cf_api_key",
-  API_EMAIL = "@cf_email",
-  ACCOUNT_ID = "@cf_account_id",
-  ZONE_ID = "@cf_zone_id"
+  API_KEY = "CVPGmCXJ4fimaJ-Y6-XjLtkZC3C5_tNOir1DOxfZ",
+  API_EMAIL = "dhills.citizenk@gmail.com",
+  ACCOUNT_ID = "bfa559c07654f675a3e7744376f36b47",
+  ZONE_ID = "f7cab408c61a317dbad39a31b64f8dce"
 }
