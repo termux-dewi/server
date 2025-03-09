@@ -1,34 +1,261 @@
 import { connect } from "cloudflare:sockets";
 
-// Variables
-const rootDomain = "foolvpn.me"; // Ganti dengan domain utama kalian
-const serviceName = "nautica"; // Ganti dengan nama workers kalian
-const apiKey = ""; // Ganti dengan Global API key kalian (https://dash.cloudflare.com/profile/api-tokens)
-const apiEmail = ""; // Ganti dengan email yang kalian gunakan
-const accountID = ""; // Ganti dengan Account ID kalian (https://dash.cloudflare.com -> Klik domain yang kalian gunakan)
-const zoneID = ""; // Ganti dengan Zone ID kalian (https://dash.cloudflare.com -> Klik domain yang kalian gunakan)
-let isApiReady = false;
-let proxyIP = "";
-let cachedProxyList = [];
+// Konfigurasi Environment Variables (sebaiknya diset melalui wrangler.toml)
+const ENV = {
+  ROOT_DOMAIN: "bungur.my.id",
+  SERVICE_NAME: "vpn",
+  API_KEY: "", // Gunakan secret untuk API key
+  API_EMAIL: "", // Gunakan secret untuk email
+  ACCOUNT_ID: "", // Gunakan secret untuk account ID
+  ZONE_ID: "", // Gunakan secret untuk zone ID
+};
 
-// Constant
-const APP_DOMAIN = `${serviceName}.${rootDomain}`;
+// Constants
+const APP_DOMAIN = `${ENV.SERVICE_NAME}.${ENV.ROOT_DOMAIN}`;
 const PORTS = [443, 80];
-const PROTOCOLS = [reverse("najort"), reverse("sselv"), reverse("ss")];
-const KV_PROXY_URL = "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/kvProxyList.json";
-const PROXY_BANK_URL = "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt";
-const DNS_SERVER_ADDRESS = "8.8.8.8";
-const DNS_SERVER_PORT = 53;
-const PROXY_HEALTH_CHECK_API = "https://id1.foolvpn.me/api/v1/check";
-const CONVERTER_URL = "https://api.foolvpn.me/convert";
-const DONATE_LINK = "https://trakteer.id/dickymuliafiqri/tip";
-const PROXY_PER_PAGE = 24;
-const WS_READY_STATE_OPEN = 1;
-const WS_READY_STATE_CLOSING = 2;
-const CORS_HEADER_OPTIONS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET,HEAD,POST,OPTIONS",
-  "Access-Control-Max-Age": "86400",
+const PROTOCOLS = ["trojan", "vless", "ss"].map(reverseString);
+const URLS = {
+  KV_PROXY: "https://raw.githubusercontent.com/luckabastian/Nautica/refs/heads/main/kvProxyList.json",
+  PROXY_BANK: "https://raw.githubusercontent.com/luckabastian/Nautica/refs/heads/main/proxyList.txt",
+  HEALTH_CHECK: "https://id1.foolvpn.me/api/v1/check",
+  CONVERTER: "https://api.foolvpn.me/convert",
+  DONATE: "https://trakteer.id/dickymuliafiqri/tip",
+};
+const SETTINGS = {
+  PROXY_PER_PAGE: 24,
+  CACHE_TTL: 5 * 60 * 1000, // 5 menit
+  HEALTH_CHECK_TIMEOUT: 3000, // 3 detik
+};
+
+// Helper functions
+function reverseString(str) {
+  return str.split('').reverse().join('');
+}
+
+async function fetchWithFallback(url, options = {}) {
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return response;
+  } catch (error) {
+    console.error(`Failed to fetch ${url}: ${error.message}`);
+    return null;
+  }
+}
+
+// Cache management
+let proxyCache = {
+  data: [],
+  lastUpdated: 0,
+  async refresh() {
+    try {
+      const response = await fetchWithFallback(URLS.PROXY_BANK);
+      if (!response) return;
+      
+      const text = await response.text();
+      this.data = text.split('\n').filter(Boolean);
+      this.lastUpdated = Date.now();
+    } catch (error) {
+      console.error('Error updating proxy cache:', error);
+    }
+  },
+  get isValid() {
+    return Date.now() - this.lastUpdated < SETTINGS.CACHE_TTL;
+  }
+};
+
+// API Handlers
+async function handleApiRequest(request) {
+  const url = new URL(request.url);
+  const path = url.pathname.replace('/api/', '');
+
+  switch (path) {
+    case 'proxies':
+      return handleProxyListRequest(url);
+    case 'health':
+      return handleHealthCheck(request);
+    case 'convert':
+      return handleConversion(request);
+    default:
+      return new Response('Not Found', { status: 404 });
+  }
+}
+
+async function handleProxyListRequest(url) {
+  const params = new URLSearchParams(url.search);
+  const page = Math.max(1, parseInt(params.get('page')) || 1;
+  
+  if (!proxyCache.isValid) await proxyCache.refresh();
+  
+  const paginatedProxies = proxyCache.data.slice(
+    (page - 1) * SETTINGS.PROXY_PER_PAGE,
+    page * SETTINGS.PROXY_PER_PAGE
+  );
+
+  return new Response(JSON.stringify({
+    data: paginatedProxies,
+    total: proxyCache.data.length,
+    per_page: SETTINGS.PROXY_PER_PAGE,
+    current_page: page
+  }), {
+    headers: { 
+      'Content-Type': 'application/json',
+      ...CORS_HEADERS 
+    }
+  });
+}
+
+// Health Check Handler
+async function handleHealthCheck(request) {
+  const { searchParams } = new URL(request.url);
+  const proxyUrl = searchParams.get('url');
+  
+  if (!proxyUrl) {
+    return new Response('Missing URL parameter', { status: 400 });
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), SETTINGS.HEALTH_CHECK_TIMEOUT);
+    
+    const response = await fetch(proxyUrl, { 
+      signal: controller.signal,
+      headers: { 'User-Agent': 'Mozilla/5.0 (HealthCheck)' }
+    });
+    
+    clearTimeout(timeout);
+    return new Response(JSON.stringify({ status: response.ok }), {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ status: false }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+
+// Websocket Handler
+async function handleWebSocket(request) {
+  const [client, server] = Object.values(new WebSocketPair());
+  
+  server.accept();
+  server.addEventListener('message', async ({ data }) => {
+    try {
+      const socket = connect(data.toString());
+      const writer = new WritableStream({
+        write(chunk) { socket.write(chunk); },
+        close() { socket.close(); },
+        abort() { socket.close(); }
+      });
+      
+      const reader = socket.readable.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        server.send(value);
+      }
+    } catch (error) {
+      console.error('WebSocket error:', error);
+      server.close(1011, 'Internal Error');
+    }
+  });
+
+  return new Response(null, { status: 101, webSocket: client });
+}
+
+// Landing Page
+function generateLandingPage() {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${ENV.SERVICE_NAME} VPN Service</title>
+      <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 2rem; }
+        .section { margin-bottom: 2rem; padding: 1rem; border: 1px solid #ddd; }
+        .donate { text-align: center; padding: 2rem; background: #f5f5f5; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>${ENV.SERVICE_NAME} VPN Service</h1>
+          <p>High-performance VPN service powered by Cloudflare Workers</p>
+        </div>
+        
+        <div class="section">
+          <h2>Service Status</h2>
+          <div id="status">Loading status...</div>
+        </div>
+
+        <div class="donate">
+          <h3>Support Our Service</h3>
+          <a href="${URLS.DONATE}" target="_blank">
+            <button>Donate Now</button>
+          </a>
+        </div>
+      </div>
+      
+      <script>
+        // Client-side status check
+        async function checkStatus() {
+          try {
+            const res = await fetch('/api/health?url=${URLS.HEALTH_CHECK}');
+            const data = await res.json();
+            document.getElementById('status').innerHTML = 
+              data.status ? '✅ Service Operational' : '⚠️ Service Degraded';
+          } catch {
+            document.getElementById('status').innerHTML = '❌ Service Offline';
+          }
+        }
+        checkStatus();
+        setInterval(checkStatus, 30000);
+      </script>
+    </body>
+    </html>
+  `;
+}
+
+// Main handler
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    
+    // Handle CORS preflight
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: CORS_HEADERS });
+    }
+
+    // API Routes
+    if (url.pathname.startsWith('/api/')) {
+      return handleApiRequest(request);
+    }
+
+    // WebSocket Proxy
+    if (url.pathname === '/proxy') {
+      return handleWebSocket(request);
+    }
+
+    // Landing Page
+    return new Response(generateLandingPage(), {
+      headers: { 
+        'Content-Type': 'text/html',
+        ...CORS_HEADERS 
+      }
+    });
+  }
+};
+
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Max-Age': '86400'
 };
 
 async function getKVProxyList(kvProxyUrl = KV_PROXY_URL) {
