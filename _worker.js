@@ -2,7 +2,7 @@ import { connect } from "cloudflare:sockets";
 
 // Konfigurasi Environment Variables (sebaiknya diset melalui wrangler.toml)
 const ENV = {
-  ROOT_DOMAIN: "bungur.my.id",
+  ROOT_DOMAIN: "lucka.biz.id",
   SERVICE_NAME: "vpn",
   API_KEY: "", // Gunakan secret untuk API key
   API_EMAIL: "", // Gunakan secret untuk email
