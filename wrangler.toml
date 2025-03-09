@@ -3,7 +3,7 @@ main = "_worker.js"
 compatibility_date = "2024-05-20"
 
 [vars]
-ROOT_DOMAIN = "bungur.my.id"
+ROOT_DOMAIN = "lucka.biz.id"
 SERVICE_NAME = "vpn"
 
 [env.production]
