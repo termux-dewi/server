@@ -1,10 +1,10 @@
-name = "nautica"
+name = "vpn"
 main = "_worker.js"
 compatibility_date = "2024-05-20"
 
 [vars]
-ROOT_DOMAIN = "foolvpn.me"
-SERVICE_NAME = "nautica"
+ROOT_DOMAIN = "bungur.my.id"
+SERVICE_NAME = "vpn"
 
 [env.production]
 vars = { 
