@@ -16,7 +16,7 @@ const PORTS = [443, 80];
 const PROTOCOLS = ["trojan", "vless", "ss"].map(reverseString);
 const URLS = {
   KV_PROXY: "https://raw.githubusercontent.com/luckabastian/Nautica/refs/heads/main/kvProxyList.json",
-  PROXY_BANK: "https://raw.githubusercontent.com/luckabastian/Nautica/refs/heads/main/proxyList.txt",
+  PROXY_BANK: "https://raw.githubusercontent.com/luckabastian/Nautica/refs/heads/main/rawProxyList.txt",
   HEALTH_CHECK: "https://id1.foolvpn.me/api/v1/check",
   CONVERTER: "https://api.foolvpn.me/convert",
   DONATE: "https://trakteer.id/dickymuliafiqri/tip",
