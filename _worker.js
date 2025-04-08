@@ -9,7 +9,7 @@ const apiKey = "os5PJub7s0ZQnaSSL7s919CgPkW4RqjaFB-7xuRJ"; // Ganti dengan Globa
 const apiEmail = "user354@gmail.com"; // Ganti dengan email yang kalian gunakan
 const accountID = "ad2032cbcc924916468a19c8832ce7dd"; // Ganti dengan Account ID kalian (https://dash.cloudflare.com -> Klik domain yang kalian gunakan)
 const zoneID = "9d6e75ff6fb2a99c1d0e247c9670c514"; // Ganti dengan Zone ID kalian (https://dash.cloudflare.com -> Klik domain yang kalian gunakan)
-let isApiReady = false;
+let isApiReady = true;
 let proxyIP = "https://raw.githubusercontent.com/FoolVPN-ID/Nautica/refs/heads/main/proxyList.txt";
 let cachedProxyList = [];
 
